@@ -65,7 +65,7 @@
   <!-- Weekly Needs Summary -->
   <div class="section">
     <h2>Weekly Needs Summary</h2>
-    <div class="result">Weekly Minimum Goal: $<span id="weeklyMin">773</span> <span class="warning">(Locked - from expenses)</span></div>
+    <div class="result">Weekly Minimum Goal: $<span id="weeklyMin">773</span> <span class="warning">(Locked)</span></div>
     
     <label>Weekly Additional Income Desired: $<input type="number" id="additional" value="500" oninput="calculate()"></label>
     <div class="result">Weekly Realistic Goal: $<span id="weeklyReal">1273</span></div>
@@ -87,7 +87,7 @@
   <!-- MRO Weekly Targets Table -->
   <div class="section">
     <h2>MRO Weekly Targets</h2>
-    <p class="warning">⚠️ AP per Sale is a Company Average ($650). Changing this affects all calculations below.</p>
+    <p class="warning">⚠️ AP per Sale is a Company Average ($650).</p>
     <label>AP per Sale ($): <input type="number" id="apPerSale" value="650" oninput="calculate()"></label>
 
     <table>
@@ -100,35 +100,35 @@
         </tr>
       </thead>
       <tbody>
+        <!-- Row 1: Weekly Income Goal (comes from above) -->
         <tr>
           <td><strong>Weekly Income Goal</strong></td>
           <td>$<span id="goalMin">773</span></td>
           <td>$<span id="goalReal">1273</span></td>
           <td>$<span id="goalOpt">2000</span></td>
         </tr>
+        
+        <!-- Row 2: Employees Enrolled (calculated with full decimal) -->
         <tr>
-          <td><strong>Employees Enrolled (needed)</strong></td>
-          <td><span id="empMin">2</span></td>
-          <td><span id="empReal">3</span></td>
-          <td><span id="empOpt">5</span></td>
+          <td><strong>Employees Enrolled</strong></td>
+          <td><span id="empMin">1.19</span></td>
+          <td><span id="empReal">1.96</span></td>
+          <td><span id="empOpt">3.07</span></td>
         </tr>
+        
+        <!-- Row 3: Weekly AP Goal (Employees full decimal × AP per Sale) -->
         <tr>
-          <td><strong>Weekly AP Goal (needed)</strong></td>
-          <td>$<span id="apMin">1300</span></td>
-          <td>$<span id="apReal">1950</span></td>
-          <td>$<span id="apOpt">3250</span></td>
+          <td><strong>Weekly AP Goal</strong></td>
+          <td>$<span id="apMin">773</span></td>
+          <td>$<span id="apReal">1273</span></td>
+          <td>$<span id="apOpt">2000</span></td>
         </tr>
+        
         <tr>
-          <td><strong>Weekly Income (calculated)</strong></td>
-          <td>$<span id="incMin">773</span></td>
-          <td>$<span id="incReal">1160</span></td>
-          <td>$<span id="incOpt">1933</span></td>
-        </tr>
-        <tr>
-          <td><strong>Annual Income</strong></td>
-          <td>$<span id="annualMin">40,196</span></td>
-          <td>$<span id="annualReal">60,320</span></td>
-          <td>$<span id="annualOpt">100,516</span></td>
+          <td><strong>Annual AP Goal</strong></td>
+          <td>$<span id="annualAPMin">40,196</span></td>
+          <td>$<span id="annualAPReal">66,196</span></td>
+          <td>$<span id="annualAPOpt">104,000</span></td>
         </tr>
       </tbody>
     </table>
@@ -156,7 +156,7 @@
     }
 
     function calculate() {
-      // 1. Weekly Income Goals
+      // === Weekly Income Goals (from Weekly Needs Summary) ===
       const expenses = ['rent','utilities','credit','car','food','entertainment','cable','insurance','phone','gas','other']
         .reduce((sum, id) => sum + (parseFloat(document.getElementById(id).value) || 0), 0);
       
@@ -173,51 +173,39 @@
       const weeklyOpt = parseFloat(document.getElementById('weeklyOpt').value) || 0;
       document.getElementById('goalOpt').textContent = weeklyOpt;
 
-      // 2. Inputs
-      const apPerSale     = parseFloat(document.getElementById('apPerSale').value) || 650;
-      const commRate      = parseFloat(document.getElementById('commRate').value) / 100 || 0.47;
-      const bonusPct      = parseFloat(document.getElementById('bonusPct').value) / 100 || 0.10;
-      const lifeSplit     = parseFloat(document.getElementById('lifeSplit').value) / 100 || 0.85;
-      const advanceRate   = parseFloat(document.getElementById('advanceRate').value) / 100 || 0.60;
+      // === Inputs ===
+      const apPerSale   = parseFloat(document.getElementById('apPerSale').value) || 650;
+      const commRate    = parseFloat(document.getElementById('commRate').value) / 100 || 0.47;
+      const bonusPct    = parseFloat(document.getElementById('bonusPct').value) / 100 || 0.10;
+      const lifeSplit   = parseFloat(document.getElementById('lifeSplit').value) / 100 || 0.85;
+      const advanceRate = parseFloat(document.getElementById('advanceRate').value) / 100 || 0.60;
 
-      // 3. Blended Rate using your formula
-      // (DirectRate × DirectMultiplier) + (LifeRate × BonusRate)
+      // === Blended Rate (from your formula) ===
+      // (Commission × Advance) + (Life Split × Bonus)
       const blendedRate = (commRate * advanceRate) + (lifeSplit * bonusPct);
 
-      // Income per employee per week
-      const incomePerEmployee = apPerSale * blendedRate;
+      // === Employees Enrolled (full decimal, using your exact formula structure) ===
+      const empMin  = weeklyMin  / (apPerSale * blendedRate);
+      const empReal = weeklyReal / (apPerSale * blendedRate);
+      const empOpt  = weeklyOpt  / (apPerSale * blendedRate);
 
-      // 4. Calculate required Employees using your exact formula
-      const empMin = incomePerEmployee > 0 ? Math.ceil(weeklyMin / incomePerEmployee) : 0;
-      const empReal = incomePerEmployee > 0 ? Math.ceil(weeklyReal / incomePerEmployee) : 0;
-      const empOpt = incomePerEmployee > 0 ? Math.ceil(weeklyOpt / incomePerEmployee) : 0;
-
-      // 5. Weekly AP Goal
-      const apMin = empMin * apPerSale;
+      // === Weekly AP Goal = Employees (full decimal) × AP per Sale ===
+      const apMin  = empMin  * apPerSale;
       const apReal = empReal * apPerSale;
-      const apOpt = empOpt * apPerSale;
+      const apOpt  = empOpt  * apPerSale;
 
-      // 6. Calculated Weekly Income (should closely match goal)
-      const incMin = apMin * blendedRate;
-      const incReal = apReal * blendedRate;
-      const incOpt = apOpt * blendedRate;
+      // === Update Table ===
+      document.getElementById('empMin').textContent  = empMin.toFixed(2);
+      document.getElementById('empReal').textContent = empReal.toFixed(2);
+      document.getElementById('empOpt').textContent  = empOpt.toFixed(2);
 
-      // 7. Update Table
-      document.getElementById('empMin').textContent = empMin;
-      document.getElementById('empReal').textContent = empReal;
-      document.getElementById('empOpt').textContent = empOpt;
-
-      document.getElementById('apMin').textContent = Math.round(apMin).toLocaleString('en-US');
+      document.getElementById('apMin').textContent  = Math.round(apMin).toLocaleString('en-US');
       document.getElementById('apReal').textContent = Math.round(apReal).toLocaleString('en-US');
       document.getElementById('apOpt').textContent = Math.round(apOpt).toLocaleString('en-US');
 
-      document.getElementById('incMin').textContent = Math.round(incMin).toLocaleString('en-US');
-      document.getElementById('incReal').textContent = Math.round(incReal).toLocaleString('en-US');
-      document.getElementById('incOpt').textContent = Math.round(incOpt).toLocaleString('en-US');
-
-      document.getElementById('annualMin').textContent = Math.round(incMin * 52).toLocaleString('en-US');
-      document.getElementById('annualReal').textContent = Math.round(incReal * 52).toLocaleString('en-US');
-      document.getElementById('annualOpt').textContent = Math.round(incOpt * 52).toLocaleString('en-US');
+      document.getElementById('annualAPMin').textContent  = Math.round(apMin * 52).toLocaleString('en-US');
+      document.getElementById('annualAPReal').textContent = Math.round(apReal * 52).toLocaleString('en-US');
+      document.getElementById('annualAPOpt').textContent = Math.round(apOpt * 52).toLocaleString('en-US');
     }
 
     function saveToLocal() {
@@ -250,7 +238,7 @@
       body += `Weekly Minimum Goal: $${document.getElementById('weeklyMin').textContent}\n`;
       body += `Weekly Realistic Goal: $${document.getElementById('weeklyReal').textContent}\n`;
       body += `Weekly Optimistic Goal: $${document.getElementById('weeklyOpt').value}\n\n`;
-      body += "Required Activity to Hit Goals:\n";
+      body += "MRO Weekly Targets:\n";
       body += `Minimum: ${document.getElementById('empMin').textContent} employees | $${document.getElementById('apMin').textContent} Weekly AP\n`;
       body += `Realistic: ${document.getElementById('empReal').textContent} employees | $${document.getElementById('apReal').textContent} Weekly AP\n`;
       body += `Optimistic: ${document.getElementById('empOpt').textContent} employees | $${document.getElementById('apOpt').textContent} Weekly AP\n`;
