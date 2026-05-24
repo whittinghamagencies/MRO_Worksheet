@@ -156,7 +156,7 @@
     }
 
     function calculate() {
-      // === 1. Calculate Weekly Income Goals ===
+      // 1. Weekly Income Goals
       const expenses = ['rent','utilities','credit','car','food','entertainment','cable','insurance','phone','gas','other']
         .reduce((sum, id) => sum + (parseFloat(document.getElementById(id).value) || 0), 0);
       
@@ -173,34 +173,43 @@
       const weeklyOpt = parseFloat(document.getElementById('weeklyOpt').value) || 0;
       document.getElementById('goalOpt').textContent = weeklyOpt;
 
-      // === 2. Pay Rates & AP per Sale ===
-      const apPerSale = parseFloat(document.getElementById('apPerSale').value) || 650;
-      const commRate = parseFloat(document.getElementById('commRate').value) / 100 || 0.47;
-      const bonusPct = parseFloat(document.getElementById('bonusPct').value) / 100 || 0.10;
+      // 2. Inputs
+      const apPerSale     = parseFloat(document.getElementById('apPerSale').value) || 650;
+      const commRate      = parseFloat(document.getElementById('commRate').value) / 100 || 0.47;
+      const bonusPct      = parseFloat(document.getElementById('bonusPct').value) / 100 || 0.10;
+      const lifeSplit     = parseFloat(document.getElementById('lifeSplit').value) / 100 || 0.85;
+      const advanceRate   = parseFloat(document.getElementById('advanceRate').value) / 100 || 0.60;
 
-      // === 3. Calculate Required Employees & Weekly AP Goal for each scenario ===
-      const incomePerEmployee = apPerSale * commRate * (1 + bonusPct);
+      // 3. Blended Rate using your formula
+      // (DirectRate × DirectMultiplier) + (LifeRate × BonusRate)
+      const blendedRate = (commRate * advanceRate) + (lifeSplit * bonusPct);
 
+      // Income per employee per week
+      const incomePerEmployee = apPerSale * blendedRate;
+
+      // 4. Calculate required Employees using your exact formula
       const empMin = incomePerEmployee > 0 ? Math.ceil(weeklyMin / incomePerEmployee) : 0;
       const empReal = incomePerEmployee > 0 ? Math.ceil(weeklyReal / incomePerEmployee) : 0;
       const empOpt = incomePerEmployee > 0 ? Math.ceil(weeklyOpt / incomePerEmployee) : 0;
 
+      // 5. Weekly AP Goal
       const apMin = empMin * apPerSale;
       const apReal = empReal * apPerSale;
       const apOpt = empOpt * apPerSale;
 
-      const incMin = apMin * commRate * (1 + bonusPct);
-      const incReal = apReal * commRate * (1 + bonusPct);
-      const incOpt = apOpt * commRate * (1 + bonusPct);
+      // 6. Calculated Weekly Income (should closely match goal)
+      const incMin = apMin * blendedRate;
+      const incReal = apReal * blendedRate;
+      const incOpt = apOpt * blendedRate;
 
-      // === 4. Update Table ===
+      // 7. Update Table
       document.getElementById('empMin').textContent = empMin;
       document.getElementById('empReal').textContent = empReal;
       document.getElementById('empOpt').textContent = empOpt;
 
-      document.getElementById('apMin').textContent = apMin.toLocaleString('en-US');
-      document.getElementById('apReal').textContent = apReal.toLocaleString('en-US');
-      document.getElementById('apOpt').textContent = apOpt.toLocaleString('en-US');
+      document.getElementById('apMin').textContent = Math.round(apMin).toLocaleString('en-US');
+      document.getElementById('apReal').textContent = Math.round(apReal).toLocaleString('en-US');
+      document.getElementById('apOpt').textContent = Math.round(apOpt).toLocaleString('en-US');
 
       document.getElementById('incMin').textContent = Math.round(incMin).toLocaleString('en-US');
       document.getElementById('incReal').textContent = Math.round(incReal).toLocaleString('en-US');
