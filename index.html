@@ -81,9 +81,10 @@
     <label>Bonus (%): <input type="number" id="bonusPct" value="10" step="0.1" oninput="checkCompanyChange(this)"></label>
     <label class="warning">Life-Health Split (%): <input type="number" id="lifeSplit" value="85" step="0.1" oninput="checkCompanyChange(this)"></label>
     <label class="warning">Avg Participation Rate (%): <input type="number" id="partRate" value="60" step="0.1" oninput="checkCompanyChange(this)"></label>
+    <label class="warning">Advance Rate (%): <input type="number" id="advanceRate" value="60" step="0.1" oninput="checkCompanyChange(this)"></label>
   </div>
 
-  <!-- MRO Weekly Targets Table (A37:D45 style) -->
+  <!-- MRO Weekly Targets Table -->
   <div class="section">
     <h2>MRO Weekly Targets</h2>
     <p class="warning">⚠️ AP per Sale is a Company Average ($650). Changing this affects all calculations below.</p>
@@ -178,19 +179,16 @@
       const bonusPct = parseFloat(document.getElementById('bonusPct').value) / 100 || 0.10;
 
       // === 3. Calculate Required Employees & Weekly AP Goal for each scenario ===
-      // Employees needed = Weekly Income Goal / (AP per Sale × Commission × (1 + Bonus))
       const incomePerEmployee = apPerSale * commRate * (1 + bonusPct);
 
       const empMin = incomePerEmployee > 0 ? Math.ceil(weeklyMin / incomePerEmployee) : 0;
       const empReal = incomePerEmployee > 0 ? Math.ceil(weeklyReal / incomePerEmployee) : 0;
       const empOpt = incomePerEmployee > 0 ? Math.ceil(weeklyOpt / incomePerEmployee) : 0;
 
-      // Weekly AP Goal needed = Employees × AP per Sale
       const apMin = empMin * apPerSale;
       const apReal = empReal * apPerSale;
       const apOpt = empOpt * apPerSale;
 
-      // Calculated Weekly Income (should be close to goal)
       const incMin = apMin * commRate * (1 + bonusPct);
       const incReal = apReal * commRate * (1 + bonusPct);
       const incOpt = apOpt * commRate * (1 + bonusPct);
