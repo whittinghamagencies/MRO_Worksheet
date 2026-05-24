@@ -5,30 +5,117 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MRO Worksheet - The Whittingham Agencies</title>
   <style>
-    body { font-family: Arial, sans-serif; max-width: 1100px; margin: 20px auto; padding: 20px; background: #f4f7fa; color: #003087; }
+    body { 
+      font-family: Arial, sans-serif; 
+      max-width: 1100px; 
+      margin: 20px auto; 
+      padding: 20px; 
+      background: #f4f7fa; 
+      color: #003087; 
+    }
     header { text-align: center; margin-bottom: 30px; }
     img { max-width: 380px; height: auto; }
     h1 { color: #003087; margin: 10px 0; }
-    h2 { color: #003087; border-bottom: 3px solid #003087; padding-bottom: 8px; }
+    h2 { color: #003087; border-bottom: 3px solid #003087; padding-bottom: 8px; font-size: 1.3em; }
 
-    .section { background: white; padding: 20px; border-radius: 8px; margin-bottom: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .section { 
+      background: white; 
+      padding: 20px; 
+      border-radius: 8px; 
+      margin-bottom: 25px; 
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
+    }
     label { display: block; margin: 10px 0 5px; font-weight: bold; }
     input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 1.05em; }
 
-    .result { font-size: 1.25em; font-weight: bold; color: #003087; background: #e6f0ff; padding: 12px; border-radius: 6px; margin: 10px 0; }
-    table { width: 100%; border-collapse: collapse; margin: 15px 0; }
-    th, td { padding: 12px; text-align: center; border: 1px solid #003087; }
+    .result { 
+      font-size: 1.2em; 
+      font-weight: bold; 
+      color: #003087; 
+      background: #e6f0ff; 
+      padding: 10px; 
+      border-radius: 6px; 
+      margin: 8px 0; 
+    }
+    table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+    th, td { padding: 10px; text-align: center; border: 1px solid #003087; font-size: 0.95em; }
     th { background: #003087; color: white; }
-    .warning { color: #d32f2f; font-weight: bold; font-size: 0.95em; }
+    .warning { color: #d32f2f; font-weight: bold; font-size: 0.9em; }
 
-    button { padding: 12px 24px; font-size: 1.05em; background: #003087; color: white; border: none; border-radius: 6px; cursor: pointer; margin: 8px 4px; }
+    button { 
+      padding: 12px 24px; 
+      font-size: 1.05em; 
+      background: #003087; 
+      color: white; 
+      border: none; 
+      border-radius: 6px; 
+      cursor: pointer; 
+      margin: 8px 4px; 
+    }
     button:hover { background: #002266; }
 
+    /* ========== PRINT STYLES ========== */
     @media print {
-      body { background: white; margin: 0; padding: 10mm; max-width: none; }
-      .section { box-shadow: none; border: 1px solid #ccc; }
-      .no-print { display: none; }
-      input { border: none; background: transparent; }
+      @page {
+        size: A4 portrait;
+        margin: 12mm;
+      }
+      
+      body { 
+        background: white; 
+        margin: 0; 
+        padding: 0; 
+        max-width: 100%; 
+        font-size: 11px;
+      }
+      
+      header { margin-bottom: 10px; }
+      img { max-width: 280px; }
+      h1 { font-size: 1.4em; margin: 5px 0; }
+      h2 { font-size: 1.1em; margin: 8px 0 6px; padding-bottom: 4px; }
+      
+      .section { 
+        padding: 8px 12px; 
+        margin-bottom: 10px; 
+        box-shadow: none; 
+        border: 1px solid #ccc;
+        page-break-inside: avoid;
+      }
+      
+      label { 
+        margin: 4px 0 2px; 
+        font-size: 0.95em;
+      }
+      input { 
+        padding: 4px 6px; 
+        font-size: 0.95em; 
+        height: auto;
+      }
+      
+      .result { 
+        font-size: 1.05em; 
+        padding: 6px 10px; 
+        margin: 6px 0;
+      }
+      
+      table { 
+        margin: 8px 0; 
+        font-size: 0.9em;
+      }
+      th, td { padding: 6px 8px; }
+      
+      .warning { font-size: 0.85em; }
+      
+      .actions, button, .no-print { 
+        display: none !important; 
+      }
+      
+      /* Make expense list more compact */
+      .section label {
+        display: inline-block;
+        width: 48%;
+        margin-right: 2%;
+      }
     }
   </style>
 </head>
@@ -44,7 +131,7 @@
     <label>Date: <input type="date" id="date" value=""></label>
   </div>
 
-  <!-- Monthly Expense Summary (blank defaults) -->
+  <!-- Monthly Expense Summary -->
   <div class="section">
     <h2>Agent Monthly Expense Summary</h2>
     <label>Rent/Mortgage: $<input type="number" id="rent" oninput="calculate()"></label>
@@ -62,7 +149,7 @@
     <div class="result">Total Monthly Expenses: $<span id="totalMonthly">0</span></div>
   </div>
 
-  <!-- Weekly Needs Summary (blank defaults) -->
+  <!-- Weekly Needs Summary -->
   <div class="section">
     <h2>Weekly Needs Summary</h2>
     <div class="result">Weekly Minimum Goal: $<span id="weeklyMin">0</span> <span class="warning">(Locked)</span></div>
@@ -144,7 +231,6 @@
     }
 
     function calculate() {
-      // 1. Weekly Income Goals
       const expenses = ['rent','utilities','credit','car','food','entertainment','cable','insurance','phone','gas','other']
         .reduce((sum, id) => sum + (parseFloat(document.getElementById(id).value) || 0), 0);
       
@@ -161,27 +247,22 @@
       const weeklyOpt = parseFloat(document.getElementById('weeklyOpt').value) || 0;
       document.getElementById('goalOpt').textContent = weeklyOpt;
 
-      // 2. Inputs
       const apPerSale   = parseFloat(document.getElementById('apPerSale').value) || 650;
       const commRate    = parseFloat(document.getElementById('commRate').value) / 100 || 0.47;
       const bonusPct    = parseFloat(document.getElementById('bonusPct').value) / 100 || 0.10;
       const lifeSplit   = parseFloat(document.getElementById('lifeSplit').value) / 100 || 0.85;
       const advanceRate = parseFloat(document.getElementById('advanceRate').value) / 100 || 0.60;
 
-      // 3. Blended Rate
       const blendedRate = (commRate * advanceRate) + (lifeSplit * bonusPct);
 
-      // 4. Employees Enrolled (full decimal)
       const empMin  = weeklyMin  / (apPerSale * blendedRate);
       const empReal = weeklyReal / (apPerSale * blendedRate);
       const empOpt  = weeklyOpt  / (apPerSale * blendedRate);
 
-      // 5. Weekly AP Goal
       const apMin  = empMin  * apPerSale;
       const apReal = empReal * apPerSale;
       const apOpt  = empOpt  * apPerSale;
 
-      // 6. Update Table
       document.getElementById('empMin').textContent  = isFinite(empMin) ? empMin.toFixed(2) : '0.00';
       document.getElementById('empReal').textContent = isFinite(empReal) ? empReal.toFixed(2) : '0.00';
       document.getElementById('empOpt').textContent  = isFinite(empOpt) ? empOpt.toFixed(2) : '0.00';
