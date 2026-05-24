@@ -44,33 +44,33 @@
     <label>Date: <input type="date" id="date" value=""></label>
   </div>
 
-  <!-- Monthly Expense Summary -->
+  <!-- Monthly Expense Summary (blank defaults) -->
   <div class="section">
     <h2>Agent Monthly Expense Summary</h2>
-    <label>Rent/Mortgage: $<input type="number" id="rent" value="1200" oninput="calculate()"></label>
-    <label>Utilities: $<input type="number" id="utilities" value="250" oninput="calculate()"></label>
-    <label>Credit Cards/Debt: $<input type="number" id="credit" value="300" oninput="calculate()"></label>
-    <label>Car Payment: $<input type="number" id="car" value="350" oninput="calculate()"></label>
-    <label>Food/Groceries: $<input type="number" id="food" value="600" oninput="calculate()"></label>
-    <label>Entertainment: $<input type="number" id="entertainment" value="150" oninput="calculate()"></label>
-    <label>Cable/Internet: $<input type="number" id="cable" value="120" oninput="calculate()"></label>
-    <label>Insurance: $<input type="number" id="insurance" value="180" oninput="calculate()"></label>
-    <label>Phone: $<input type="number" id="phone" value="100" oninput="calculate()"></label>
-    <label>Gas/Transportation: $<input type="number" id="gas" value="200" oninput="calculate()"></label>
-    <label>Other: $<input type="number" id="other" value="100" oninput="calculate()"></label>
+    <label>Rent/Mortgage: $<input type="number" id="rent" oninput="calculate()"></label>
+    <label>Utilities: $<input type="number" id="utilities" oninput="calculate()"></label>
+    <label>Credit Cards/Debt: $<input type="number" id="credit" oninput="calculate()"></label>
+    <label>Car Payment: $<input type="number" id="car" oninput="calculate()"></label>
+    <label>Food/Groceries: $<input type="number" id="food" oninput="calculate()"></label>
+    <label>Entertainment: $<input type="number" id="entertainment" oninput="calculate()"></label>
+    <label>Cable/Internet: $<input type="number" id="cable" oninput="calculate()"></label>
+    <label>Insurance: $<input type="number" id="insurance" oninput="calculate()"></label>
+    <label>Phone: $<input type="number" id="phone" oninput="calculate()"></label>
+    <label>Gas/Transportation: $<input type="number" id="gas" oninput="calculate()"></label>
+    <label>Other: $<input type="number" id="other" oninput="calculate()"></label>
 
-    <div class="result">Total Monthly Expenses: $<span id="totalMonthly">3350</span></div>
+    <div class="result">Total Monthly Expenses: $<span id="totalMonthly">0</span></div>
   </div>
 
-  <!-- Weekly Needs Summary -->
+  <!-- Weekly Needs Summary (blank defaults) -->
   <div class="section">
     <h2>Weekly Needs Summary</h2>
-    <div class="result">Weekly Minimum Goal: $<span id="weeklyMin">773</span> <span class="warning">(Locked)</span></div>
+    <div class="result">Weekly Minimum Goal: $<span id="weeklyMin">0</span> <span class="warning">(Locked)</span></div>
     
-    <label>Weekly Additional Income Desired: $<input type="number" id="additional" value="500" oninput="calculate()"></label>
-    <div class="result">Weekly Realistic Goal: $<span id="weeklyReal">1273</span></div>
+    <label>Weekly Additional Income Desired: $<input type="number" id="additional" oninput="calculate()"></label>
+    <div class="result">Weekly Realistic Goal: $<span id="weeklyReal">0</span></div>
     
-    <label>Weekly Optimistic Goal (Your Target): $<input type="number" id="weeklyOpt" value="2000" oninput="calculate()"></label>
+    <label>Weekly Optimistic Goal (Your Target): $<input type="number" id="weeklyOpt" oninput="calculate()"></label>
   </div>
 
   <!-- Agent Pay Summary -->
@@ -100,35 +100,23 @@
         </tr>
       </thead>
       <tbody>
-        <!-- Row 1: Weekly Income Goal (comes from above) -->
         <tr>
           <td><strong>Weekly Income Goal</strong></td>
-          <td>$<span id="goalMin">773</span></td>
-          <td>$<span id="goalReal">1273</span></td>
-          <td>$<span id="goalOpt">2000</span></td>
+          <td>$<span id="goalMin">0</span></td>
+          <td>$<span id="goalReal">0</span></td>
+          <td>$<span id="goalOpt">0</span></td>
         </tr>
-        
-        <!-- Row 2: Employees Enrolled (calculated with full decimal) -->
         <tr>
           <td><strong>Employees Enrolled</strong></td>
-          <td><span id="empMin">1.19</span></td>
-          <td><span id="empReal">1.96</span></td>
-          <td><span id="empOpt">3.07</span></td>
+          <td><span id="empMin">0.00</span></td>
+          <td><span id="empReal">0.00</span></td>
+          <td><span id="empOpt">0.00</span></td>
         </tr>
-        
-        <!-- Row 3: Weekly AP Goal (Employees full decimal × AP per Sale) -->
         <tr>
           <td><strong>Weekly AP Goal</strong></td>
-          <td>$<span id="apMin">773</span></td>
-          <td>$<span id="apReal">1273</span></td>
-          <td>$<span id="apOpt">2000</span></td>
-        </tr>
-        
-        <tr>
-          <td><strong>Annual AP Goal</strong></td>
-          <td>$<span id="annualAPMin">40,196</span></td>
-          <td>$<span id="annualAPReal">66,196</span></td>
-          <td>$<span id="annualAPOpt">104,000</span></td>
+          <td>$<span id="apMin">0</span></td>
+          <td>$<span id="apReal">0</span></td>
+          <td>$<span id="apOpt">0</span></td>
         </tr>
       </tbody>
     </table>
@@ -156,7 +144,7 @@
     }
 
     function calculate() {
-      // === Weekly Income Goals (from Weekly Needs Summary) ===
+      // 1. Weekly Income Goals
       const expenses = ['rent','utilities','credit','car','food','entertainment','cable','insurance','phone','gas','other']
         .reduce((sum, id) => sum + (parseFloat(document.getElementById(id).value) || 0), 0);
       
@@ -173,39 +161,34 @@
       const weeklyOpt = parseFloat(document.getElementById('weeklyOpt').value) || 0;
       document.getElementById('goalOpt').textContent = weeklyOpt;
 
-      // === Inputs ===
+      // 2. Inputs
       const apPerSale   = parseFloat(document.getElementById('apPerSale').value) || 650;
       const commRate    = parseFloat(document.getElementById('commRate').value) / 100 || 0.47;
       const bonusPct    = parseFloat(document.getElementById('bonusPct').value) / 100 || 0.10;
       const lifeSplit   = parseFloat(document.getElementById('lifeSplit').value) / 100 || 0.85;
       const advanceRate = parseFloat(document.getElementById('advanceRate').value) / 100 || 0.60;
 
-      // === Blended Rate (from your formula) ===
-      // (Commission × Advance) + (Life Split × Bonus)
+      // 3. Blended Rate
       const blendedRate = (commRate * advanceRate) + (lifeSplit * bonusPct);
 
-      // === Employees Enrolled (full decimal, using your exact formula structure) ===
+      // 4. Employees Enrolled (full decimal)
       const empMin  = weeklyMin  / (apPerSale * blendedRate);
       const empReal = weeklyReal / (apPerSale * blendedRate);
       const empOpt  = weeklyOpt  / (apPerSale * blendedRate);
 
-      // === Weekly AP Goal = Employees (full decimal) × AP per Sale ===
+      // 5. Weekly AP Goal
       const apMin  = empMin  * apPerSale;
       const apReal = empReal * apPerSale;
       const apOpt  = empOpt  * apPerSale;
 
-      // === Update Table ===
-      document.getElementById('empMin').textContent  = empMin.toFixed(2);
-      document.getElementById('empReal').textContent = empReal.toFixed(2);
-      document.getElementById('empOpt').textContent  = empOpt.toFixed(2);
+      // 6. Update Table
+      document.getElementById('empMin').textContent  = isFinite(empMin) ? empMin.toFixed(2) : '0.00';
+      document.getElementById('empReal').textContent = isFinite(empReal) ? empReal.toFixed(2) : '0.00';
+      document.getElementById('empOpt').textContent  = isFinite(empOpt) ? empOpt.toFixed(2) : '0.00';
 
       document.getElementById('apMin').textContent  = Math.round(apMin).toLocaleString('en-US');
       document.getElementById('apReal').textContent = Math.round(apReal).toLocaleString('en-US');
       document.getElementById('apOpt').textContent = Math.round(apOpt).toLocaleString('en-US');
-
-      document.getElementById('annualAPMin').textContent  = Math.round(apMin * 52).toLocaleString('en-US');
-      document.getElementById('annualAPReal').textContent = Math.round(apReal * 52).toLocaleString('en-US');
-      document.getElementById('annualAPOpt').textContent = Math.round(apOpt * 52).toLocaleString('en-US');
     }
 
     function saveToLocal() {
