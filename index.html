@@ -7,56 +7,25 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   
   <style>
-    body { 
-      font-family: Arial, sans-serif; 
-      max-width: 1100px; 
-      margin: 20px auto; 
-      padding: 20px; 
-      background: #f4f7fa; 
-      color: #003087; 
-    }
+    body { font-family: Arial, sans-serif; max-width: 1100px; margin: 20px auto; padding: 20px; background: #f4f7fa; color: #003087; }
     header { text-align: center; margin-bottom: 30px; }
     img { max-width: 380px; height: auto; }
     h1 { color: #003087; margin: 10px 0; }
     h2 { color: #003087; border-bottom: 3px solid #003087; padding-bottom: 8px; }
 
-    .section { 
-      background: white; 
-      padding: 20px; 
-      border-radius: 8px; 
-      margin-bottom: 25px; 
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
-    }
+    .section { background: white; padding: 20px; border-radius: 8px; margin-bottom: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
     label { display: block; margin: 10px 0 5px; font-weight: bold; }
     input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 1.05em; }
 
-    .result { 
-      font-size: 1.2em; 
-      font-weight: bold; 
-      color: #003087; 
-      background: #e6f0ff; 
-      padding: 10px; 
-      border-radius: 6px; 
-      margin: 8px 0; 
-    }
+    .result { font-size: 1.2em; font-weight: bold; color: #003087; background: #e6f0ff; padding: 10px; border-radius: 6px; margin: 8px 0; }
     table { width: 100%; border-collapse: collapse; margin: 15px 0; }
     th, td { padding: 10px; text-align: center; border: 1px solid #003087; }
     th { background: #003087; color: white; }
     .warning { color: #d32f2f; font-weight: bold; font-size: 0.9em; }
 
-    button { 
-      padding: 12px 24px; 
-      font-size: 1.05em; 
-      background: #003087; 
-      color: white; 
-      border: none; 
-      border-radius: 6px; 
-      cursor: pointer; 
-      margin: 8px 4px; 
-    }
+    button { padding: 12px 24px; font-size: 1.05em; background: #003087; color: white; border: none; border-radius: 6px; cursor: pointer; margin: 8px 4px; }
     button:hover { background: #002266; }
 
-    /* Print / PDF Styles */
     @media print {
       body { background: white; margin: 0; padding: 10mm; max-width: none; }
       .section { box-shadow: none; border: 1px solid #ccc; }
@@ -66,94 +35,98 @@
   </style>
 </head>
 <body>
-  <header>
-    <img src="logo.png" alt="Globe Life - The Whittingham Agencies">
-    <h1>MRO Worksheet</h1>
-  </header>
 
-  <!-- Name & Date -->
-  <div class="section">
-    <label>Agent Name: <input type="text" id="agentName" value="Your Name"></label>
-    <label>Date: <input type="date" id="date" value=""></label>
-  </div>
+  <!-- Main content wrapper for PDF -->
+  <div id="pdf-content">
+    <header>
+      <img src="logo.png" alt="Globe Life - The Whittingham Agencies">
+      <h1>MRO Worksheet</h1>
+    </header>
 
-  <!-- Monthly Expense Summary -->
-  <div class="section">
-    <h2>Agent Monthly Expense Summary</h2>
-    <label>Rent/Mortgage: $<input type="number" id="rent" oninput="calculate()"></label>
-    <label>Utilities: $<input type="number" id="utilities" oninput="calculate()"></label>
-    <label>Credit Cards/Debt: $<input type="number" id="credit" oninput="calculate()"></label>
-    <label>Car Payment: $<input type="number" id="car" oninput="calculate()"></label>
-    <label>Food/Groceries: $<input type="number" id="food" oninput="calculate()"></label>
-    <label>Entertainment: $<input type="number" id="entertainment" oninput="calculate()"></label>
-    <label>Cable/Internet: $<input type="number" id="cable" oninput="calculate()"></label>
-    <label>Insurance: $<input type="number" id="insurance" oninput="calculate()"></label>
-    <label>Phone: $<input type="number" id="phone" oninput="calculate()"></label>
-    <label>Gas/Transportation: $<input type="number" id="gas" oninput="calculate()"></label>
-    <label>Other: $<input type="number" id="other" oninput="calculate()"></label>
+    <!-- Name & Date -->
+    <div class="section">
+      <label>Agent Name: <input type="text" id="agentName" value="Your Name"></label>
+      <label>Date: <input type="date" id="date" value=""></label>
+    </div>
 
-    <div class="result">Total Monthly Expenses: $<span id="totalMonthly">0</span></div>
-  </div>
+    <!-- Monthly Expense Summary -->
+    <div class="section">
+      <h2>Agent Monthly Expense Summary</h2>
+      <label>Rent/Mortgage: $<input type="number" id="rent" oninput="calculate()"></label>
+      <label>Utilities: $<input type="number" id="utilities" oninput="calculate()"></label>
+      <label>Credit Cards/Debt: $<input type="number" id="credit" oninput="calculate()"></label>
+      <label>Car Payment: $<input type="number" id="car" oninput="calculate()"></label>
+      <label>Food/Groceries: $<input type="number" id="food" oninput="calculate()"></label>
+      <label>Entertainment: $<input type="number" id="entertainment" oninput="calculate()"></label>
+      <label>Cable/Internet: $<input type="number" id="cable" oninput="calculate()"></label>
+      <label>Insurance: $<input type="number" id="insurance" oninput="calculate()"></label>
+      <label>Phone: $<input type="number" id="phone" oninput="calculate()"></label>
+      <label>Gas/Transportation: $<input type="number" id="gas" oninput="calculate()"></label>
+      <label>Other: $<input type="number" id="other" oninput="calculate()"></label>
 
-  <!-- Weekly Needs Summary -->
-  <div class="section">
-    <h2>Weekly Needs Summary</h2>
-    <div class="result">Weekly Minimum Goal: $<span id="weeklyMin">0</span> <span class="warning">(Locked)</span></div>
-    
-    <label>Weekly Additional Income Desired: $<input type="number" id="additional" oninput="calculate()"></label>
-    <div class="result">Weekly Realistic Goal: $<span id="weeklyReal">0</span></div>
-    
-    <label>Weekly Optimistic Goal (Your Target): $<input type="number" id="weeklyOpt" oninput="calculate()"></label>
-  </div>
+      <div class="result">Total Monthly Expenses: $<span id="totalMonthly">0</span></div>
+    </div>
 
-  <!-- Agent Pay Summary -->
-  <div class="section">
-    <h2>Agent Pay Summary</h2>
-    <p class="warning">⚠️ Company Averages — Use Caution When Changing</p>
-    <label>Commission Rate (%): <input type="number" id="commRate" value="47" step="0.1" oninput="checkCompanyChange(this)"></label>
-    <label>Bonus (%): <input type="number" id="bonusPct" value="10" step="0.1" oninput="checkCompanyChange(this)"></label>
-    <label class="warning">Life-Health Split (%): <input type="number" id="lifeSplit" value="85" step="0.1" oninput="checkCompanyChange(this)"></label>
-    <label class="warning">Avg Participation Rate (%): <input type="number" id="partRate" value="60" step="0.1" oninput="checkCompanyChange(this)"></label>
-    <label class="warning">Advance Rate (%): <input type="number" id="advanceRate" value="60" step="0.1" oninput="checkCompanyChange(this)"></label>
-  </div>
+    <!-- Weekly Needs Summary -->
+    <div class="section">
+      <h2>Weekly Needs Summary</h2>
+      <div class="result">Weekly Minimum Goal: $<span id="weeklyMin">0</span> <span class="warning">(Locked)</span></div>
+      
+      <label>Weekly Additional Income Desired: $<input type="number" id="additional" oninput="calculate()"></label>
+      <div class="result">Weekly Realistic Goal: $<span id="weeklyReal">0</span></div>
+      
+      <label>Weekly Optimistic Goal (Your Target): $<input type="number" id="weeklyOpt" oninput="calculate()"></label>
+    </div>
 
-  <!-- MRO Weekly Targets Table -->
-  <div class="section">
-    <h2>MRO Weekly Targets</h2>
-    <p class="warning">⚠️ AP per Sale is a Company Average ($650).</p>
-    <label>AP per Sale ($): <input type="number" id="apPerSale" value="650" oninput="calculate()"></label>
+    <!-- Agent Pay Summary -->
+    <div class="section">
+      <h2>Agent Pay Summary</h2>
+      <p class="warning">⚠️ Company Averages — Use Caution When Changing</p>
+      <label>Commission Rate (%): <input type="number" id="commRate" value="47" step="0.1" oninput="checkCompanyChange(this)"></label>
+      <label>Bonus (%): <input type="number" id="bonusPct" value="10" step="0.1" oninput="checkCompanyChange(this)"></label>
+      <label class="warning">Life-Health Split (%): <input type="number" id="lifeSplit" value="85" step="0.1" oninput="checkCompanyChange(this)"></label>
+      <label class="warning">Avg Participation Rate (%): <input type="number" id="partRate" value="60" step="0.1" oninput="checkCompanyChange(this)"></label>
+      <label class="warning">Advance Rate (%): <input type="number" id="advanceRate" value="60" step="0.1" oninput="checkCompanyChange(this)"></label>
+    </div>
 
-    <table>
-      <thead>
-        <tr>
-          <th></th>
-          <th>Minimum</th>
-          <th>Realistic</th>
-          <th>Optimistic</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><strong>Weekly Income Goal</strong></td>
-          <td>$<span id="goalMin">0</span></td>
-          <td>$<span id="goalReal">0</span></td>
-          <td>$<span id="goalOpt">0</span></td>
-        </tr>
-        <tr>
-          <td><strong>Employees Enrolled</strong></td>
-          <td><span id="empMin">0.00</span></td>
-          <td><span id="empReal">0.00</span></td>
-          <td><span id="empOpt">0.00</span></td>
-        </tr>
-        <tr>
-          <td><strong>Weekly AP Goal</strong></td>
-          <td>$<span id="apMin">0</span></td>
-          <td>$<span id="apReal">0</span></td>
-          <td>$<span id="apOpt">0</span></td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+    <!-- MRO Weekly Targets Table -->
+    <div class="section">
+      <h2>MRO Weekly Targets</h2>
+      <p class="warning">⚠️ AP per Sale is a Company Average ($650).</p>
+      <label>AP per Sale ($): <input type="number" id="apPerSale" value="650" oninput="calculate()"></label>
+
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>Minimum</th>
+            <th>Realistic</th>
+            <th>Optimistic</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Weekly Income Goal</strong></td>
+            <td>$<span id="goalMin">0</span></td>
+            <td>$<span id="goalReal">0</span></td>
+            <td>$<span id="goalOpt">0</span></td>
+          </tr>
+          <tr>
+            <td><strong>Employees Enrolled</strong></td>
+            <td><span id="empMin">0.00</span></td>
+            <td><span id="empReal">0.00</span></td>
+            <td><span id="empOpt">0.00</span></td>
+          </tr>
+          <tr>
+            <td><strong>Weekly AP Goal</strong></td>
+            <td>$<span id="apMin">0</span></td>
+            <td>$<span id="apReal">0</span></td>
+            <td>$<span id="apOpt">0</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div> <!-- End of pdf-content -->
 
   <!-- Action Buttons -->
   <div class="actions no-print" style="text-align:center; margin:30px 0;">
@@ -244,27 +217,19 @@
       window.print();
     }
 
-    // Refined PDF Download
+    // Fixed PDF Download
     function downloadPDF() {
       const element = document.getElementById('pdf-content');
       
       const opt = {
-        margin:       [0.4, 0.5, 0.4, 0.5], // top, left, bottom, right
+        margin:       0.5,
         filename:     'MRO_Worksheet.pdf',
         image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { 
-          scale: 2,
-          useCORS: true,
-          logging: false
-        },
-        jsPDF:        { 
-          unit: 'in', 
-          format: 'letter', 
-          orientation: 'portrait' 
-        }
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
       };
 
-      // Temporarily hide buttons for cleaner PDF
+      // Hide action buttons during PDF generation
       const actions = document.querySelector('.actions');
       if (actions) actions.style.display = 'none';
 
@@ -272,8 +237,8 @@
         .set(opt)
         .from(element)
         .save()
-        .then(() => {
-          // Restore buttons after PDF is generated
+        .finally(() => {
+          // Show buttons again after download
           if (actions) actions.style.display = 'block';
         });
     }
