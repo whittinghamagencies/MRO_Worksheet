@@ -7,36 +7,71 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   
   <style>
-    body { font-family: Arial, sans-serif; max-width: 1100px; margin: 20px auto; padding: 20px; background: #f4f7fa; color: #003087; }
-    header { text-align: center; margin-bottom: 30px; }
-    img { max-width: 380px; height: auto; }
-    h1 { color: #003087; margin: 10px 0; }
-    h2 { color: #003087; border-bottom: 3px solid #003087; padding-bottom: 8px; }
+    body { 
+      font-family: Arial, sans-serif; 
+      max-width: 1000px; 
+      margin: 20px auto; 
+      padding: 20px; 
+      background: #f4f7fa; 
+      color: #003087; 
+    }
+    header { text-align: center; margin-bottom: 20px; }
+    img { max-width: 320px; height: auto; }
+    h1 { color: #003087; margin: 8px 0; font-size: 1.6em; }
+    h2 { color: #003087; border-bottom: 2px solid #003087; padding-bottom: 6px; font-size: 1.15em; margin-top: 15px; }
 
-    .section { background: white; padding: 20px; border-radius: 8px; margin-bottom: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-    label { display: block; margin: 10px 0 5px; font-weight: bold; }
-    input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 1.05em; }
+    .section { 
+      background: white; 
+      padding: 15px 18px; 
+      border-radius: 6px; 
+      margin-bottom: 18px; 
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08); 
+    }
+    label { display: block; margin: 8px 0 3px; font-weight: 600; font-size: 0.95em; }
+    input { 
+      width: 100%; 
+      padding: 7px 10px; 
+      border: 1px solid #ccc; 
+      border-radius: 4px; 
+      font-size: 0.95em; 
+    }
 
-    .result { font-size: 1.2em; font-weight: bold; color: #003087; background: #e6f0ff; padding: 10px; border-radius: 6px; margin: 8px 0; }
-    table { width: 100%; border-collapse: collapse; margin: 15px 0; }
-    th, td { padding: 10px; text-align: center; border: 1px solid #003087; }
+    .result { 
+      font-size: 1.1em; 
+      font-weight: bold; 
+      color: #003087; 
+      background: #e6f0ff; 
+      padding: 8px 12px; 
+      border-radius: 5px; 
+      margin: 8px 0; 
+    }
+    table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+    th, td { padding: 8px 10px; text-align: center; border: 1px solid #003087; font-size: 0.9em; }
     th { background: #003087; color: white; }
-    .warning { color: #d32f2f; font-weight: bold; font-size: 0.9em; }
+    .warning { color: #c62828; font-weight: 600; font-size: 0.85em; }
 
-    button { padding: 12px 24px; font-size: 1.05em; background: #003087; color: white; border: none; border-radius: 6px; cursor: pointer; margin: 8px 4px; }
+    button { 
+      padding: 11px 22px; 
+      font-size: 1em; 
+      background: #003087; 
+      color: white; 
+      border: none; 
+      border-radius: 5px; 
+      cursor: pointer; 
+      margin: 6px 3px; 
+    }
     button:hover { background: #002266; }
 
+    /* PDF-specific styling */
     @media print {
-      body { background: white; margin: 0; padding: 10mm; max-width: none; }
-      .section { box-shadow: none; border: 1px solid #ccc; }
+      body { background: white; margin: 0; padding: 15mm; }
+      .section { box-shadow: none; border: 1px solid #ddd; padding: 10px 12px; margin-bottom: 12px; }
       .no-print { display: none; }
-      input { border: none; background: transparent; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Main content wrapper for PDF -->
   <div id="pdf-content">
     <header>
       <img src="logo.png" alt="Globe Life - The Whittingham Agencies">
@@ -45,7 +80,7 @@
 
     <!-- Name & Date -->
     <div class="section">
-      <label>Agent Name: <input type="text" id="agentName" value="Your Name"></label>
+      <label>Agent Name: <input type="text" id="agentName" value=""></label>
       <label>Date: <input type="date" id="date" value=""></label>
     </div>
 
@@ -126,15 +161,13 @@
         </tbody>
       </table>
     </div>
-  </div> <!-- End of pdf-content -->
+  </div>
 
-  <!-- Action Buttons -->
-  <div class="actions no-print" style="text-align:center; margin:30px 0;">
+  <!-- Buttons -->
+  <div class="actions no-print" style="text-align:center; margin:25px 0;">
     <button onclick="saveToLocal()">💾 Save Progress</button>
     <button onclick="loadFromLocal()">📂 Load Last Save</button>
     <button onclick="downloadPDF()">📄 Download as PDF</button>
-    <button onclick="printWorksheet()">🖨️ Print</button>
-    <button onclick="emailResults()">✉️ Email Results</button>
   </div>
 
   <script>
@@ -213,23 +246,17 @@
       }
     }
 
-    function printWorksheet() {
-      window.print();
-    }
-
-    // Fixed PDF Download
     function downloadPDF() {
       const element = document.getElementById('pdf-content');
       
       const opt = {
-        margin:       0.5,
+        margin:       [0.5, 0.6, 0.5, 0.6],
         filename:     'MRO_Worksheet.pdf',
         image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2 },
+        html2canvas:  { scale: 2, useCORS: true },
         jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
       };
 
-      // Hide action buttons during PDF generation
       const actions = document.querySelector('.actions');
       if (actions) actions.style.display = 'none';
 
@@ -238,26 +265,8 @@
         .from(element)
         .save()
         .finally(() => {
-          // Show buttons again after download
           if (actions) actions.style.display = 'block';
         });
-    }
-
-    function emailResults() {
-      const emails = prompt("Enter up to 4 email addresses (comma separated):", "");
-      if (!emails) return;
-
-      let body = `MRO Worksheet - ${document.getElementById('agentName').value}\nDate: ${document.getElementById('date').value}\n\n`;
-      body += `Weekly Minimum Goal: $${document.getElementById('weeklyMin').textContent}\n`;
-      body += `Weekly Realistic Goal: $${document.getElementById('weeklyReal').textContent}\n`;
-      body += `Weekly Optimistic Goal: $${document.getElementById('weeklyOpt').value}\n\n`;
-      body += "MRO Weekly Targets:\n";
-      body += `Minimum: ${document.getElementById('empMin').textContent} employees | $${document.getElementById('apMin').textContent} Weekly AP\n`;
-      body += `Realistic: ${document.getElementById('empReal').textContent} employees | $${document.getElementById('apReal').textContent} Weekly AP\n`;
-      body += `Optimistic: ${document.getElementById('empOpt').textContent} employees | $${document.getElementById('apOpt').textContent} Weekly AP\n`;
-
-      const mailtoLink = `mailto:${emails}?subject=MRO Worksheet Results&body=${encodeURIComponent(body)}`;
-      window.location.href = mailtoLink;
     }
 
     window.onload = () => {
