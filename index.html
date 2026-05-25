@@ -4,8 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MRO Worksheet - The Whittingham Agencies</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-  
+
+  <!-- jsPDF + AutoTable -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+
   <style>
     body { font-family: Arial, sans-serif; max-width: 1000px; margin: 20px auto; padding: 20px; background: #f4f7fa; color: #003087; }
     header { text-align: center; margin-bottom: 20px; }
@@ -25,23 +28,10 @@
 
     button { padding: 11px 20px; font-size: 1em; background: #003087; color: white; border: none; border-radius: 5px; cursor: pointer; margin: 6px 3px; }
     button:hover { background: #002266; }
-
-    #pdf-template {
-      position: absolute;
-      left: -9999px;
-      top: 0;
-      width: 800px;
-      background: white;
-      color: #003087;
-      padding: 20px;
-      font-size: 11px;
-      line-height: 1.3;
-    }
   </style>
 </head>
 <body>
 
-  <!-- Interactive Form -->
   <header>
     <img src="logo.png" alt="Globe Life - The Whittingham Agencies">
     <h1>MRO Worksheet</h1>
@@ -124,78 +114,9 @@
     <button onclick="downloadPDF()">📄 Download as PDF</button>
   </div>
 
-  <!-- PDF Template -->
-  <div id="pdf-template">
-    <div style="text-align:center; margin-bottom:12px;">
-      <img src="logo.png" alt="Logo" style="max-width:200px;">
-      <h1 style="margin:6px 0 4px; font-size:1.35em;">MRO Worksheet</h1>
-      <p style="margin:0; font-size:0.95em;">
-        <strong>Agent:</strong> <span id="pdf-name"></span> &nbsp;&nbsp; 
-        <strong>Date:</strong> <span id="pdf-date"></span>
-      </p>
-    </div>
-
-    <h2>Agent Monthly Expense Summary</h2>
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:3px 12px; font-size:0.9em;">
-      <div>Rent/Mortgage: $<span id="pdf-rent"></span></div>
-      <div>Utilities: $<span id="pdf-utilities"></span></div>
-      <div>Credit Cards/Debt: $<span id="pdf-credit"></span></div>
-      <div>Car Payment: $<span id="pdf-car"></span></div>
-      <div>Food/Groceries: $<span id="pdf-food"></span></div>
-      <div>Entertainment: $<span id="pdf-entertainment"></span></div>
-      <div>Cable/Internet: $<span id="pdf-cable"></span></div>
-      <div>Insurance: $<span id="pdf-insurance"></span></div>
-      <div>Phone: $<span id="pdf-phone"></span></div>
-      <div>Gas/Transportation: $<span id="pdf-gas"></span></div>
-      <div>Other: $<span id="pdf-other"></span></div>
-    </div>
-    <div style="margin:8px 0; font-weight:bold;">Total Monthly Expenses: $<span id="pdf-totalMonthly"></span></div>
-
-    <h2>Weekly Needs Summary</h2>
-    <p style="margin:3px 0;"><strong>Weekly Minimum Goal:</strong> $<span id="pdf-weeklyMin"></span></p>
-    <p style="margin:3px 0;"><strong>Weekly Additional Desired:</strong> $<span id="pdf-additional"></span></p>
-    <p style="margin:3px 0;"><strong>Weekly Realistic Goal:</strong> $<span id="pdf-weeklyReal"></span></p>
-    <p style="margin:3px 0;"><strong>Weekly Optimistic Goal:</strong> $<span id="pdf-weeklyOpt"></span></p>
-
-    <h2>Agent Pay Summary</h2>
-    <p style="margin:4px 0; font-size:0.9em;">
-      Commission: <span id="pdf-commRate"></span>% &nbsp;|&nbsp; 
-      Bonus: <span id="pdf-bonusPct"></span>% &nbsp;|&nbsp; 
-      Life-Health Split: <span id="pdf-lifeSplit"></span>% &nbsp;|&nbsp; 
-      Advance Rate: <span id="pdf-advanceRate"></span>%
-    </p>
-
-    <h2>MRO Weekly Targets</h2>
-    <table style="width:100%; border-collapse:collapse; font-size:0.9em;">
-      <thead>
-        <tr style="background:#003087; color:white;">
-          <th></th><th>Minimum</th><th>Realistic</th><th>Optimistic</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><strong>Weekly Income Goal</strong></td>
-          <td>$<span id="pdf-goalMin"></span></td>
-          <td>$<span id="pdf-goalReal"></span></td>
-          <td>$<span id="pdf-goalOpt"></span></td>
-        </tr>
-        <tr>
-          <td><strong>Employees Enrolled</strong></td>
-          <td><span id="pdf-empMin"></span></td>
-          <td><span id="pdf-empReal"></span></td>
-          <td><span id="pdf-empOpt"></span></td>
-        </tr>
-        <tr>
-          <td><strong>Weekly AP Goal</strong></td>
-          <td>$<span id="pdf-apMin"></span></td>
-          <td>$<span id="pdf-apReal"></span></td>
-          <td>$<span id="pdf-apOpt"></span></td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
   <script>
+    const { jsPDF } = window.jspdf;
+
     function calculate() {
       const expenses = ['rent','utilities','credit','car','food','entertainment','cable','insurance','phone','gas','other']
         .reduce((sum, id) => sum + (parseFloat(document.getElementById(id).value) || 0), 0);
@@ -259,70 +180,100 @@
     }
 
     function downloadPDF() {
-      // Populate the template
-      document.getElementById('pdf-name').textContent = document.getElementById('agentName').value || 'N/A';
-      document.getElementById('pdf-date').textContent = document.getElementById('date').value || 'N/A';
+      const doc = new jsPDF();
+      let y = 15;
 
-      const fields = ['rent','utilities','credit','car','food','entertainment','cable','insurance','phone','gas','other'];
-      fields.forEach(id => {
-        document.getElementById('pdf-' + id).textContent = document.getElementById(id).value || '0';
+      // Header
+      doc.setFontSize(16);
+      doc.text("MRO Worksheet - The Whittingham Agencies", 105, y, { align: "center" });
+      y += 10;
+
+      doc.setFontSize(11);
+      doc.text(`Agent: ${document.getElementById('agentName').value || 'N/A'}`, 20, y);
+      doc.text(`Date: ${document.getElementById('date').value || 'N/A'}`, 120, y);
+      y += 12;
+
+      // Monthly Expenses
+      doc.setFontSize(13);
+      doc.text("Agent Monthly Expense Summary", 20, y);
+      y += 8;
+
+      doc.setFontSize(10);
+      const expenses = [
+        ["Rent/Mortgage", document.getElementById('rent').value || "0"],
+        ["Utilities", document.getElementById('utilities').value || "0"],
+        ["Credit Cards/Debt", document.getElementById('credit').value || "0"],
+        ["Car Payment", document.getElementById('car').value || "0"],
+        ["Food/Groceries", document.getElementById('food').value || "0"],
+        ["Entertainment", document.getElementById('entertainment').value || "0"],
+        ["Cable/Internet", document.getElementById('cable').value || "0"],
+        ["Insurance", document.getElementById('insurance').value || "0"],
+        ["Phone", document.getElementById('phone').value || "0"],
+        ["Gas/Transportation", document.getElementById('gas').value || "0"],
+        ["Other", document.getElementById('other').value || "0"],
+      ];
+
+      doc.autoTable({
+        startY: y,
+        head: [["Expense", "Amount ($ )"]],
+        body: expenses,
+        theme: 'grid',
+        styles: { fontSize: 9 },
+        headStyles: { fillColor: [0, 48, 135] }
       });
-      document.getElementById('pdf-totalMonthly').textContent = document.getElementById('totalMonthly').textContent;
 
-      document.getElementById('pdf-additional').textContent = document.getElementById('additional').value || '0';
-      document.getElementById('pdf-weeklyMin').textContent = document.getElementById('weeklyMin').textContent;
-      document.getElementById('pdf-weeklyReal').textContent = document.getElementById('weeklyReal').textContent;
-      document.getElementById('pdf-weeklyOpt').textContent = document.getElementById('weeklyOpt').value || '0';
+      y = doc.lastAutoTable.finalY + 10;
 
-      document.getElementById('pdf-commRate').textContent = document.getElementById('commRate').value;
-      document.getElementById('pdf-bonusPct').textContent = document.getElementById('bonusPct').value;
-      document.getElementById('pdf-lifeSplit').textContent = document.getElementById('lifeSplit').value;
-      document.getElementById('pdf-advanceRate').textContent = document.getElementById('advanceRate').value;
+      // Weekly Needs
+      doc.setFontSize(13);
+      doc.text("Weekly Needs Summary", 20, y);
+      y += 7;
+      doc.setFontSize(10);
+      doc.text(`Weekly Minimum Goal: $${document.getElementById('weeklyMin').textContent}`, 20, y);
+      y += 6;
+      doc.text(`Weekly Additional Desired: $${document.getElementById('additional').value || "0"}`, 20, y);
+      y += 6;
+      doc.text(`Weekly Realistic Goal: $${document.getElementById('weeklyReal').textContent}`, 20, y);
+      y += 6;
+      doc.text(`Weekly Optimistic Goal: $${document.getElementById('weeklyOpt').value || "0"}`, 20, y);
+      y += 10;
 
-      document.getElementById('pdf-goalMin').textContent = document.getElementById('goalMin').textContent;
-      document.getElementById('pdf-goalReal').textContent = document.getElementById('goalReal').textContent;
-      document.getElementById('pdf-goalOpt').textContent = document.getElementById('goalOpt').textContent;
-      document.getElementById('pdf-empMin').textContent = document.getElementById('empMin').textContent;
-      document.getElementById('pdf-empReal').textContent = document.getElementById('empReal').textContent;
-      document.getElementById('pdf-empOpt').textContent = document.getElementById('empOpt').textContent;
-      document.getElementById('pdf-apMin').textContent = document.getElementById('apMin').textContent;
-      document.getElementById('pdf-apReal').textContent = document.getElementById('apReal').textContent;
-      document.getElementById('pdf-apOpt').textContent = document.getElementById('apOpt').textContent;
+      // Pay Summary
+      doc.setFontSize(13);
+      doc.text("Agent Pay Summary", 20, y);
+      y += 7;
+      doc.setFontSize(10);
+      doc.text(`Commission Rate: ${document.getElementById('commRate').value}%`, 20, y);
+      y += 6;
+      doc.text(`Bonus: ${document.getElementById('bonusPct').value}%`, 20, y);
+      y += 6;
+      doc.text(`Life-Health Split: ${document.getElementById('lifeSplit').value}%`, 20, y);
+      y += 6;
+      doc.text(`Advance Rate: ${document.getElementById('advanceRate').value}%`, 20, y);
+      y += 10;
 
-      const template = document.getElementById('pdf-template');
+      // MRO Table
+      doc.setFontSize(13);
+      doc.text("MRO Weekly Targets", 20, y);
+      y += 8;
 
-      // Force show the template for rendering
-      template.style.position = 'static';
-      template.style.left = '0';
-      template.style.display = 'block';
+      const mroData = [
+        ["", "Minimum", "Realistic", "Optimistic"],
+        ["Weekly Income Goal", `$${document.getElementById('goalMin').textContent}`, `$${document.getElementById('goalReal').textContent}`, `$${document.getElementById('goalOpt').textContent}`],
+        ["Employees Enrolled", document.getElementById('empMin').textContent, document.getElementById('empReal').textContent, document.getElementById('empOpt').textContent],
+        ["Weekly AP Goal", `$${document.getElementById('apMin').textContent}`, `$${document.getElementById('apReal').textContent}`, `$${document.getElementById('apOpt').textContent}`],
+      ];
 
-      const opt = {
-        margin: 0.5,
-        filename: 'MRO_Worksheet.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-      };
+      doc.autoTable({
+        startY: y,
+        head: [mroData[0]],
+        body: mroData.slice(1),
+        theme: 'grid',
+        styles: { fontSize: 9 },
+        headStyles: { fillColor: [0, 48, 135] }
+      });
 
-      setTimeout(() => {
-        html2pdf()
-          .set(opt)
-          .from(template)
-          .save()
-          .then(() => {
-            // Hide template again
-            template.style.position = 'absolute';
-            template.style.left = '-9999px';
-            template.style.display = 'none';
-          })
-          .catch(err => {
-            console.error("PDF generation error:", err);
-            alert("There was an error generating the PDF. Please try again.");
-            template.style.position = 'absolute';
-            template.style.left = '-9999px';
-            template.style.display = 'none';
-          });
-      }, 400); // Increased timeout
+      doc.save("MRO_Worksheet.pdf");
     }
 
     window.onload = () => {
