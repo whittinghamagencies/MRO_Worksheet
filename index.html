@@ -1,14 +1,9 @@
-✅ Added! You can now download the worksheet as a PDF with one click.
-I added a new "Download as PDF" button that generates a clean, professional PDF of the entire worksheet.
-Updated Code (with PDF download feature):
-HTML<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MRO Worksheet - The Whittingham Agencies</title>
-  
-  <!-- html2pdf.js for PDF generation -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   
   <style>
@@ -36,18 +31,18 @@ HTML<!DOCTYPE html>
     input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 1.05em; }
 
     .result { 
-      font-size: 1.25em; 
+      font-size: 1.2em; 
       font-weight: bold; 
       color: #003087; 
       background: #e6f0ff; 
-      padding: 12px; 
+      padding: 10px; 
       border-radius: 6px; 
-      margin: 10px 0; 
+      margin: 8px 0; 
     }
     table { width: 100%; border-collapse: collapse; margin: 15px 0; }
-    th, td { padding: 12px; text-align: center; border: 1px solid #003087; }
+    th, td { padding: 10px; text-align: center; border: 1px solid #003087; }
     th { background: #003087; color: white; }
-    .warning { color: #d32f2f; font-weight: bold; font-size: 0.95em; }
+    .warning { color: #d32f2f; font-weight: bold; font-size: 0.9em; }
 
     button { 
       padding: 12px 24px; 
@@ -61,6 +56,7 @@ HTML<!DOCTYPE html>
     }
     button:hover { background: #002266; }
 
+    /* Print / PDF Styles */
     @media print {
       body { background: white; margin: 0; padding: 10mm; max-width: none; }
       .section { box-shadow: none; border: 1px solid #ccc; }
@@ -224,7 +220,6 @@ HTML<!DOCTYPE html>
       document.getElementById('apOpt').textContent = Math.round(apOpt).toLocaleString('en-US');
     }
 
-    // Save / Load
     function saveToLocal() {
       const data = {};
       document.querySelectorAll('input').forEach(input => data[input.id] = input.value);
@@ -245,25 +240,44 @@ HTML<!DOCTYPE html>
       }
     }
 
-    // Print
     function printWorksheet() {
       window.print();
     }
 
-    // Download as PDF
+    // Refined PDF Download
     function downloadPDF() {
-      const element = document.body;
+      const element = document.getElementById('pdf-content');
+      
       const opt = {
-        margin:       0.5,
+        margin:       [0.4, 0.5, 0.4, 0.5], // top, left, bottom, right
         filename:     'MRO_Worksheet.pdf',
         image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2 },
-        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+        html2canvas:  { 
+          scale: 2,
+          useCORS: true,
+          logging: false
+        },
+        jsPDF:        { 
+          unit: 'in', 
+          format: 'letter', 
+          orientation: 'portrait' 
+        }
       };
-      html2pdf().set(opt).from(element).save();
+
+      // Temporarily hide buttons for cleaner PDF
+      const actions = document.querySelector('.actions');
+      if (actions) actions.style.display = 'none';
+
+      html2pdf()
+        .set(opt)
+        .from(element)
+        .save()
+        .then(() => {
+          // Restore buttons after PDF is generated
+          if (actions) actions.style.display = 'block';
+        });
     }
 
-    // Email
     function emailResults() {
       const emails = prompt("Enter up to 4 email addresses (comma separated):", "");
       if (!emails) return;
