@@ -26,23 +26,23 @@
     button { padding: 11px 20px; font-size: 1em; background: #003087; color: white; border: none; border-radius: 5px; cursor: pointer; margin: 6px 3px; }
     button:hover { background: #002266; }
 
-    /* Compact PDF styles */
+    /* PDF Template - positioned off screen */
     #pdf-template {
-      display: none;
+      position: absolute;
+      left: -9999px;
+      top: -9999px;
+      width: 800px;
+      background: white;
+      color: #003087;
+      padding: 20px;
       font-size: 11px;
-      line-height: 1.3;
+      line-height: 1.35;
     }
-    #pdf-template h1 { font-size: 1.4em; margin: 5px 0; }
-    #pdf-template h2 { font-size: 1.05em; margin: 10px 0 5px; }
-    #pdf-template .section { padding: 8px 10px; margin-bottom: 10px; }
-    #pdf-template label { margin: 4px 0 2px; font-size: 0.9em; }
-    #pdf-template input { padding: 4px 6px; font-size: 0.9em; }
-    #pdf-template .result { padding: 6px 10px; font-size: 1em; margin: 6px 0; }
   </style>
 </head>
 <body>
 
-  <!-- Interactive Form (for user) -->
+  <!-- Interactive Form -->
   <header>
     <img src="logo.png" alt="Globe Life - The Whittingham Agencies">
     <h1>MRO Worksheet</h1>
@@ -119,23 +119,25 @@
     </table>
   </div>
 
-  <!-- Buttons -->
   <div style="text-align:center; margin:25px 0;">
     <button onclick="saveToLocal()">💾 Save Progress</button>
     <button onclick="loadFromLocal()">📂 Load Last Save</button>
     <button onclick="downloadPDF()">📄 Download as PDF</button>
   </div>
 
-  <!-- Clean PDF Template (Hidden) -->
-  <div id="pdf-template" style="padding: 20px; background: white; color: #003087;">
-    <div style="text-align: center; margin-bottom: 15px;">
-      <img src="logo.png" alt="Logo" style="max-width: 220px;">
-      <h1 style="margin: 8px 0 5px;">MRO Worksheet</h1>
-      <p style="margin: 0; font-size: 0.95em;"><strong>Agent:</strong> <span id="pdf-name"></span> &nbsp;&nbsp; <strong>Date:</strong> <span id="pdf-date"></span></p>
+  <!-- Clean PDF Template -->
+  <div id="pdf-template">
+    <div style="text-align:center; margin-bottom:12px;">
+      <img src="logo.png" alt="Logo" style="max-width:200px;">
+      <h1 style="margin:6px 0 4px; font-size:1.35em;">MRO Worksheet</h1>
+      <p style="margin:0; font-size:0.95em;">
+        <strong>Agent:</strong> <span id="pdf-name"></span> &nbsp;&nbsp; 
+        <strong>Date:</strong> <span id="pdf-date"></span>
+      </p>
     </div>
 
     <h2>Agent Monthly Expense Summary</h2>
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px 15px; font-size: 0.9em;">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:3px 12px; font-size:0.9em;">
       <div>Rent/Mortgage: $<span id="pdf-rent"></span></div>
       <div>Utilities: $<span id="pdf-utilities"></span></div>
       <div>Credit Cards/Debt: $<span id="pdf-credit"></span></div>
@@ -148,19 +150,24 @@
       <div>Gas/Transportation: $<span id="pdf-gas"></span></div>
       <div>Other: $<span id="pdf-other"></span></div>
     </div>
-    <div style="margin-top: 8px; font-weight: bold;">Total Monthly Expenses: $<span id="pdf-totalMonthly"></span></div>
+    <div style="margin:8px 0; font-weight:bold;">Total Monthly Expenses: $<span id="pdf-totalMonthly"></span></div>
 
     <h2>Weekly Needs Summary</h2>
-    <p><strong>Weekly Minimum Goal:</strong> $<span id="pdf-weeklyMin"></span></p>
-    <p><strong>Weekly Additional Desired:</strong> $<span id="pdf-additional"></span></p>
-    <p><strong>Weekly Realistic Goal:</strong> $<span id="pdf-weeklyReal"></span></p>
-    <p><strong>Weekly Optimistic Goal:</strong> $<span id="pdf-weeklyOpt"></span></p>
+    <p style="margin:3px 0;"><strong>Weekly Minimum Goal:</strong> $<span id="pdf-weeklyMin"></span></p>
+    <p style="margin:3px 0;"><strong>Weekly Additional Desired:</strong> $<span id="pdf-additional"></span></p>
+    <p style="margin:3px 0;"><strong>Weekly Realistic Goal:</strong> $<span id="pdf-weeklyReal"></span></p>
+    <p style="margin:3px 0;"><strong>Weekly Optimistic Goal:</strong> $<span id="pdf-weeklyOpt"></span></p>
 
     <h2>Agent Pay Summary</h2>
-    <p>Commission Rate: <span id="pdf-commRate"></span>% &nbsp; | &nbsp; Bonus: <span id="pdf-bonusPct"></span>% &nbsp; | &nbsp; Life-Health Split: <span id="pdf-lifeSplit"></span>% &nbsp; | &nbsp; Advance Rate: <span id="pdf-advanceRate"></span>%</p>
+    <p style="margin:4px 0; font-size:0.9em;">
+      Commission: <span id="pdf-commRate"></span>% &nbsp;|&nbsp; 
+      Bonus: <span id="pdf-bonusPct"></span>% &nbsp;|&nbsp; 
+      Life-Health Split: <span id="pdf-lifeSplit"></span>% &nbsp;|&nbsp; 
+      Advance Rate: <span id="pdf-advanceRate"></span>%
+    </p>
 
     <h2>MRO Weekly Targets</h2>
-    <table style="width:100%; border-collapse: collapse; font-size: 0.9em;">
+    <table style="width:100%; border-collapse:collapse; font-size:0.9em;">
       <thead>
         <tr style="background:#003087; color:white;">
           <th></th><th>Minimum</th><th>Realistic</th><th>Optimistic</th>
@@ -190,9 +197,7 @@
   </div>
 
   <script>
-    // Your existing calculate(), saveToLocal(), loadFromLocal() functions stay the same...
     function calculate() {
-      // (Keep your current calculate function exactly as it is)
       const expenses = ['rent','utilities','credit','car','food','entertainment','cable','insurance','phone','gas','other']
         .reduce((sum, id) => sum + (parseFloat(document.getElementById(id).value) || 0), 0);
       
@@ -234,45 +239,66 @@
       document.getElementById('apOpt').textContent = Math.round(apOpt).toLocaleString('en-US');
     }
 
-    function saveToLocal() { /* your existing code */ }
-    function loadFromLocal() { /* your existing code */ }
+    function saveToLocal() {
+      const data = {};
+      document.querySelectorAll('input').forEach(input => data[input.id] = input.value);
+      localStorage.setItem('mroWorksheet', JSON.stringify(data));
+      alert("✅ Progress saved!");
+    }
+
+    function loadFromLocal() {
+      const saved = localStorage.getItem('mroWorksheet');
+      if (saved) {
+        const data = JSON.parse(saved);
+        Object.keys(data).forEach(key => {
+          const el = document.getElementById(key);
+          if (el) el.value = data[key];
+        });
+        calculate();
+        alert("✅ Last save loaded!");
+      }
+    }
 
     function downloadPDF() {
-      // Populate the clean PDF template
+      // Populate PDF template
       document.getElementById('pdf-name').textContent = document.getElementById('agentName').value || 'N/A';
       document.getElementById('pdf-date').textContent = document.getElementById('date').value || 'N/A';
 
-      // Monthly Expenses
       ['rent','utilities','credit','car','food','entertainment','cable','insurance','phone','gas','other'].forEach(id => {
-        document.getElementById('pdf-' + id).textContent = document.getElementById(id).value || '0';
+        const val = document.getElementById(id).value || '0';
+        document.getElementById('pdf-' + id).textContent = val;
       });
       document.getElementById('pdf-totalMonthly').textContent = document.getElementById('totalMonthly').textContent;
 
-      // Weekly Needs
       document.getElementById('pdf-additional').textContent = document.getElementById('additional').value || '0';
       document.getElementById('pdf-weeklyMin').textContent = document.getElementById('weeklyMin').textContent;
       document.getElementById('pdf-weeklyReal').textContent = document.getElementById('weeklyReal').textContent;
       document.getElementById('pdf-weeklyOpt').textContent = document.getElementById('weeklyOpt').value || '0';
 
-      // Pay Summary
       document.getElementById('pdf-commRate').textContent = document.getElementById('commRate').value;
       document.getElementById('pdf-bonusPct').textContent = document.getElementById('bonusPct').value;
       document.getElementById('pdf-lifeSplit').textContent = document.getElementById('lifeSplit').value;
       document.getElementById('pdf-advanceRate').textContent = document.getElementById('advanceRate').value;
 
-      // MRO Table
       document.getElementById('pdf-goalMin').textContent = document.getElementById('goalMin').textContent;
       document.getElementById('pdf-goalReal').textContent = document.getElementById('goalReal').textContent;
       document.getElementById('pdf-goalOpt').textContent = document.getElementById('goalOpt').textContent;
+
       document.getElementById('pdf-empMin').textContent = document.getElementById('empMin').textContent;
       document.getElementById('pdf-empReal').textContent = document.getElementById('empReal').textContent;
       document.getElementById('pdf-empOpt').textContent = document.getElementById('empOpt').textContent;
+
       document.getElementById('pdf-apMin').textContent = document.getElementById('apMin').textContent;
       document.getElementById('pdf-apReal').textContent = document.getElementById('apReal').textContent;
       document.getElementById('pdf-apOpt').textContent = document.getElementById('apOpt').textContent;
 
-      const element = document.getElementById('pdf-template');
+      const template = document.getElementById('pdf-template');
       
+      // Temporarily show the template for rendering
+      template.style.position = 'static';
+      template.style.left = '0';
+      template.style.top = '0';
+
       const opt = {
         margin: 0.4,
         filename: 'MRO_Worksheet.pdf',
@@ -281,7 +307,16 @@
         jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
       };
 
-      html2pdf().set(opt).from(element).save();
+      html2pdf()
+        .set(opt)
+        .from(template)
+        .save()
+        .finally(() => {
+          // Hide it again after generation
+          template.style.position = 'absolute';
+          template.style.left = '-9999px';
+          template.style.top = '-9999px';
+        });
     }
 
     window.onload = () => {
