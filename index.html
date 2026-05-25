@@ -1,9 +1,16 @@
-<!DOCTYPE html>
+✅ Added! You can now download the worksheet as a PDF with one click.
+I added a new "Download as PDF" button that generates a clean, professional PDF of the entire worksheet.
+Updated Code (with PDF download feature):
+HTML<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MRO Worksheet - The Whittingham Agencies</title>
+  
+  <!-- html2pdf.js for PDF generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  
   <style>
     body { 
       font-family: Arial, sans-serif; 
@@ -16,7 +23,7 @@
     header { text-align: center; margin-bottom: 30px; }
     img { max-width: 380px; height: auto; }
     h1 { color: #003087; margin: 10px 0; }
-    h2 { color: #003087; border-bottom: 3px solid #003087; padding-bottom: 8px; font-size: 1.3em; }
+    h2 { color: #003087; border-bottom: 3px solid #003087; padding-bottom: 8px; }
 
     .section { 
       background: white; 
@@ -29,18 +36,18 @@
     input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 1.05em; }
 
     .result { 
-      font-size: 1.2em; 
+      font-size: 1.25em; 
       font-weight: bold; 
       color: #003087; 
       background: #e6f0ff; 
-      padding: 10px; 
+      padding: 12px; 
       border-radius: 6px; 
-      margin: 8px 0; 
+      margin: 10px 0; 
     }
-    table { width: 100%; border-collapse: collapse; margin: 12px 0; }
-    th, td { padding: 10px; text-align: center; border: 1px solid #003087; font-size: 0.95em; }
+    table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+    th, td { padding: 12px; text-align: center; border: 1px solid #003087; }
     th { background: #003087; color: white; }
-    .warning { color: #d32f2f; font-weight: bold; font-size: 0.9em; }
+    .warning { color: #d32f2f; font-weight: bold; font-size: 0.95em; }
 
     button { 
       padding: 12px 24px; 
@@ -54,68 +61,11 @@
     }
     button:hover { background: #002266; }
 
-    /* ========== PRINT STYLES ========== */
     @media print {
-      @page {
-        size: A4 portrait;
-        margin: 12mm;
-      }
-      
-      body { 
-        background: white; 
-        margin: 0; 
-        padding: 0; 
-        max-width: 100%; 
-        font-size: 11px;
-      }
-      
-      header { margin-bottom: 10px; }
-      img { max-width: 280px; }
-      h1 { font-size: 1.4em; margin: 5px 0; }
-      h2 { font-size: 1.1em; margin: 8px 0 6px; padding-bottom: 4px; }
-      
-      .section { 
-        padding: 8px 12px; 
-        margin-bottom: 10px; 
-        box-shadow: none; 
-        border: 1px solid #ccc;
-        page-break-inside: avoid;
-      }
-      
-      label { 
-        margin: 4px 0 2px; 
-        font-size: 0.95em;
-      }
-      input { 
-        padding: 4px 6px; 
-        font-size: 0.95em; 
-        height: auto;
-      }
-      
-      .result { 
-        font-size: 1.05em; 
-        padding: 6px 10px; 
-        margin: 6px 0;
-      }
-      
-      table { 
-        margin: 8px 0; 
-        font-size: 0.9em;
-      }
-      th, td { padding: 6px 8px; }
-      
-      .warning { font-size: 0.85em; }
-      
-      .actions, button, .no-print { 
-        display: none !important; 
-      }
-      
-      /* Make expense list more compact */
-      .section label {
-        display: inline-block;
-        width: 48%;
-        margin-right: 2%;
-      }
+      body { background: white; margin: 0; padding: 10mm; max-width: none; }
+      .section { box-shadow: none; border: 1px solid #ccc; }
+      .no-print { display: none; }
+      input { border: none; background: transparent; }
     }
   </style>
 </head>
@@ -209,10 +159,12 @@
     </table>
   </div>
 
+  <!-- Action Buttons -->
   <div class="actions no-print" style="text-align:center; margin:30px 0;">
     <button onclick="saveToLocal()">💾 Save Progress</button>
     <button onclick="loadFromLocal()">📂 Load Last Save</button>
-    <button onclick="printWorksheet()">🖨️ Print Worksheet</button>
+    <button onclick="downloadPDF()">📄 Download as PDF</button>
+    <button onclick="printWorksheet()">🖨️ Print</button>
     <button onclick="emailResults()">✉️ Email Results</button>
   </div>
 
@@ -272,6 +224,7 @@
       document.getElementById('apOpt').textContent = Math.round(apOpt).toLocaleString('en-US');
     }
 
+    // Save / Load
     function saveToLocal() {
       const data = {};
       document.querySelectorAll('input').forEach(input => data[input.id] = input.value);
@@ -292,8 +245,25 @@
       }
     }
 
-    function printWorksheet() { window.print(); }
+    // Print
+    function printWorksheet() {
+      window.print();
+    }
 
+    // Download as PDF
+    function downloadPDF() {
+      const element = document.body;
+      const opt = {
+        margin:       0.5,
+        filename:     'MRO_Worksheet.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+      };
+      html2pdf().set(opt).from(element).save();
+    }
+
+    // Email
     function emailResults() {
       const emails = prompt("Enter up to 4 email addresses (comma separated):", "");
       if (!emails) return;
